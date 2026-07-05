@@ -136,6 +136,7 @@ public:
     Q_PROPERTY(bool framePacing MEMBER framePacing NOTIFY framePacingChanged)
     Q_PROPERTY(bool vrrTearing MEMBER vrrTearing NOTIFY vrrTearingChanged)
     Q_PROPERTY(int vrrCushionUs MEMBER vrrCushionUs NOTIFY vrrCushionUsChanged)
+    Q_PROPERTY(bool osScheduledVrr MEMBER osScheduledVrr NOTIFY osScheduledVrrChanged)
     Q_PROPERTY(bool connectionWarnings MEMBER connectionWarnings NOTIFY connectionWarningsChanged)
     Q_PROPERTY(bool configurationWarnings MEMBER configurationWarnings NOTIFY configurationWarningsChanged)
     Q_PROPERTY(bool richPresence MEMBER richPresence NOTIFY richPresenceChanged)
@@ -180,6 +181,7 @@ public:
     bool framePacing;
     bool vrrTearing;
     int vrrCushionUs;
+    bool osScheduledVrr;
     bool connectionWarnings;
     bool configurationWarnings;
     bool richPresence;
@@ -229,6 +231,7 @@ signals:
     void framePacingChanged();
     void vrrTearingChanged();
     void vrrCushionUsChanged();
+    void osScheduledVrrChanged();
     void connectionWarningsChanged();
     void configurationWarningsChanged();
     void richPresenceChanged();
