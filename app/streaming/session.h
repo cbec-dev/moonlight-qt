@@ -1,5 +1,7 @@
 #pragma once
 
+#include <atomic>
+
 #include <QSemaphore>
 #include <QQuickWindow>
 
@@ -263,6 +265,7 @@ private:
     int m_MouseEmulationRefCount;
     int m_FlushingWindowEventsRef;
     QStringList m_LaunchWarnings;
+    std::atomic_bool m_InterruptRequested;
     bool m_ShouldExit;
 
     bool m_AsyncConnectionSuccess;
