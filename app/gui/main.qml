@@ -112,6 +112,21 @@ ApplicationWindow {
         anchors.fill: parent
         focus: true
 
+        pushEnter: Transition {
+            NumberAnimation { property: "opacity"; from: 0; to: 1; duration: Theme.animNormal; easing.type: Theme.easeStandard }
+            NumberAnimation { property: "scale"; from: 0.98; to: 1; duration: Theme.animNormal; easing.type: Theme.easeStandard }
+        }
+        pushExit: Transition {
+            NumberAnimation { property: "opacity"; from: 1; to: 0; duration: Theme.animFast; easing.type: Theme.easeStandard }
+        }
+        popEnter: Transition {
+            NumberAnimation { property: "opacity"; from: 0; to: 1; duration: Theme.animNormal; easing.type: Theme.easeStandard }
+        }
+        popExit: Transition {
+            NumberAnimation { property: "opacity"; from: 1; to: 0; duration: Theme.animFast; easing.type: Theme.easeStandard }
+            NumberAnimation { property: "scale"; from: 1; to: 0.98; duration: Theme.animFast; easing.type: Theme.easeStandard }
+        }
+
         Component.onCompleted: {
             // Perform our early initialization before constructing
             // the initial view and pushing it to the StackView
@@ -240,12 +255,25 @@ ApplicationWindow {
         anchors.topMargin: 5
         anchors.bottomMargin: 5
 
+        background: Rectangle {
+            color: Theme.colorBackgroundElevated
+
+            Rectangle {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                height: 1
+                color: Theme.colorBorder
+            }
+        }
+
         Label {
             id: titleLabel
             visible: toolBar.width > 700
             anchors.fill: parent
             text: stackView.currentItem.objectName
             font.pointSize: 20
+            color: Theme.colorTextPrimary
             elide: Label.ElideRight
             horizontalAlignment: Qt.AlignHCenter
             verticalAlignment: Qt.AlignVCenter
@@ -275,6 +303,7 @@ ApplicationWindow {
             Label {
                 id: titleRowLabel
                 font.pointSize: titleLabel.font.pointSize
+                color: Theme.colorTextPrimary
                 elide: Label.ElideRight
                 horizontalAlignment: Qt.AlignHCenter
                 verticalAlignment: Qt.AlignVCenter
