@@ -18,6 +18,7 @@ ItemDelegate {
 
     background: Rectangle {
         id: cardBackground
+        anchors.fill: parent
         radius: Theme.radiusCard
         color: control.highlighted || control.hovered ? Theme.colorSurfaceHover : Theme.colorSurface
         border.width: control.highlighted ? Theme.focusRingWidth : 1

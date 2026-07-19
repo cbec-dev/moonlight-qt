@@ -6,6 +6,7 @@ import QtQuick.Controls 2.2
 // Only the background changes — title/content bindings are untouched.
 GroupBox {
     background: Rectangle {
+        anchors.fill: parent
         radius: Theme.radiusCard
         color: Theme.colorSurface
         border.width: 1
