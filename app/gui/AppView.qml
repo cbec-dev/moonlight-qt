@@ -1,6 +1,7 @@
 import QtQuick 2.9
 import QtQuick.Controls 2.2
 import QtQuick.Controls.Material 2.2
+import Qt5Compat.GraphicalEffects
 
 import AppModel 1.0
 import ComputerManager 1.0
@@ -18,7 +19,9 @@ CenteredGridView {
     activeFocusOnTab: true
     topMargin: 20
     bottomMargin: 5
-    baseCellWidth: 230; baseCellHeight: 297;
+    // 2:3 ratio matches typical GFE/Steam vertical box art (e.g. 600x900),
+    // so PreserveAspectCrop rarely has to crop much off "normal" cover art.
+    baseCellWidth: 230; baseCellHeight: 345;
 
     function computerLost()
     {
@@ -71,7 +74,7 @@ CenteredGridView {
     model: appModel
 
     delegate: NavigableItemDelegate {
-        width: appGrid.cellWidth - 10; height: appGrid.cellHeight - 10;
+        width: appGrid.cellWidth - 24; height: appGrid.cellHeight - 24;
         grid: appGrid
 
         property alias appContextMenu: appContextMenuLoader.item
@@ -84,9 +87,32 @@ CenteredGridView {
             property bool isPlaceholder: false
 
             id: appIcon
-            anchors.horizontalCenter: parent.horizontalCenter
-            y: 10
+            // Fill the whole (responsively-sized) card instead of a fixed
+            // 200x267 — the card can now be larger than that on wide/TV
+            // viewports (see CenteredGridView's responsiveScale), so a fixed
+            // size left box art floating in a too-large card with no crop/fill.
+            //
+            // Full-bleed crop (not PreserveAspectFit): edge-to-edge cover art
+            // reads far better on a grid than letterboxed art with visible
+            // gaps. A centered crop can still clip a game's own baked-in
+            // title, but the title bar below now shows model.name reliably
+            // regardless, so that's no longer the legibility problem it
+            // would otherwise be.
+            //
+            // QtQuick.Effects.MultiEffect failed on the user's actual
+            // hardware (twice — plain and tuned forms), so this is now
+            // masked via Qt5Compat.GraphicalEffects' OpacityMask instead:
+            // an older, more broadly-supported API than MultiEffect. If
+            // this also fails to render, fall back to a plain full-bleed
+            // Image (no visible: false, no mask) or the small-inset-margin
+            // approach — both proven reliable, at the cost of square art
+            // corners.
+            anchors.fill: parent
+            fillMode: Image.PreserveAspectCrop
+            asynchronous: true
+            visible: false // painted via the rounded-mask OpacityMask below
             source: model.boxart
+            sourceSize: Qt.size(width, height)
 
             onSourceSizeChanged: {
                 // Nearly all of Nvidia's official box art does not match the dimensions of placeholder
@@ -104,9 +130,6 @@ CenteredGridView {
                 {
                     isPlaceholder = false
                 }
-
-                width = 200
-                height = 267
             }
 
             // Display a tooltip with the full name if it's truncated
@@ -114,6 +137,52 @@ CenteredGridView {
             ToolTip.delay: 1000
             ToolTip.timeout: 5000
             ToolTip.visible: (parent.hovered || parent.highlighted) && (!appNameText || appNameText.truncated)
+
+            // Gradient scrim + title bar for real box art. Placeholder apps
+            // get a full-tile title instead (appNameTextLoader below), since
+            // there's no artwork to show at all. This lives INSIDE appIcon
+            // (not as a sibling) so OpacityMask below captures and rounds
+            // it along with the art — as a sibling drawn on top, its own
+            // square corners covered the mask's rounded bottom corners.
+            Rectangle {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                height: 64
+                visible: !appIcon.isPlaceholder && !model.running
+                gradient: Gradient {
+                    GradientStop { position: 0.0; color: "transparent" }
+                    GradientStop { position: 1.0; color: Theme.colorScrimBottom }
+                }
+
+                Label {
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    anchors.margins: Theme.spacingS
+                    text: model.name
+                    color: Theme.colorTextPrimary
+                    font.pointSize: 13
+                    font.bold: true
+                    elide: Text.ElideRight
+                    wrapMode: Text.NoWrap
+                }
+            }
+        }
+
+        // Invisible mask shape defining the rounded corners that the box art
+        // (and the scrim/title bar nested inside it above) get clipped to.
+        Rectangle {
+            id: appIconMask
+            anchors.fill: appIcon
+            radius: Theme.radiusCard
+            visible: false
+        }
+
+        OpacityMask {
+            anchors.fill: appIcon
+            source: appIcon
+            maskSource: appIconMask
         }
 
         Loader {

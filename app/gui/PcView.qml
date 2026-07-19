@@ -107,7 +107,7 @@ CenteredGridView {
     model: computerModel
 
     delegate: NavigableItemDelegate {
-        width: pcGrid.cellWidth - 10; height: pcGrid.cellHeight - 10;
+        width: pcGrid.cellWidth - 24; height: pcGrid.cellHeight - 24;
         grid: pcGrid
 
         property alias pcContextMenu : pcContextMenuLoader.item

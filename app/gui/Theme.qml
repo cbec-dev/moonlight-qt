@@ -155,4 +155,9 @@ QtObject {
     readonly property color colorFocusRing: currentPalette.focusRing
     readonly property string fontFamily: currentPalette.fontFamily
     readonly property string fontFamilyAccent: currentPalette.fontFamilyAccent
+
+    // Scrim for legibility over box art/video thumbnails. Deliberately not
+    // themed per-palette (mirrors mockups/themes.css, where every palette
+    // used a near-black scrim regardless of accent color).
+    readonly property color colorScrimBottom: "#EB0A0B0F"
 }
