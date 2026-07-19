@@ -18,7 +18,7 @@ CenteredGridView {
     activeFocusOnTab: true
     topMargin: 20
     bottomMargin: 5
-    cellWidth: 230; cellHeight: 297;
+    baseCellWidth: 230; baseCellHeight: 297;
 
     function computerLost()
     {
@@ -71,7 +71,7 @@ CenteredGridView {
     model: appModel
 
     delegate: NavigableItemDelegate {
-        width: 220; height: 287;
+        width: appGrid.cellWidth - 10; height: appGrid.cellHeight - 10;
         grid: appGrid
 
         property alias appContextMenu: appContextMenuLoader.item
