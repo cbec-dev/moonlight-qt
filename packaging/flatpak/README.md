@@ -6,9 +6,11 @@ native packages, and binaries built on a rolling distro won't match SteamOS's
 glibc. The manifest is derived from the official Flathub packaging
 (`flathub/com.moonlight_stream.Moonlight`) with these changes:
 
-- The `moonlight` module builds this fork instead of upstream `v6.1.0`
-  (the Qt 6.9 UI patches from Flathub are already merged here).
-- The Linux vrr8 port is applied as a patch over the published vrr8 tag.
+- The `moonlight` module builds this working tree (a `dir` source pointing at
+  the repo root) instead of upstream `v6.1.0` (the Qt 6.9 UI patches from
+  Flathub are already merged here). Git submodules must be initialized
+  (`git submodule update --init --recursive`). The patches under `patches/`
+  are historical: their content is already merged into this tree.
   When VRR is enabled, Moonlight selects the Vulkan (libplacebo) renderer
   automatically. With VRR disabled, the normal renderer order is unchanged.
 - `CONFIG+=disable-libdrm` removed: the fork reads the true display refresh
@@ -25,8 +27,9 @@ lets Vulkan present directly to gamescope instead of through XWayland.
 flatpak install flathub org.flatpak.Builder org.kde.Sdk//6.10 org.kde.Platform//6.10
 flatpak run org.flatpak.Builder --user --force-clean --sandbox \
     --install-deps-from=flathub --ccache \
-    --repo=repo builddir packaging/flatpak/com.moonlight_stream.Moonlight.json
-flatpak build-bundle repo Moonlight-VRR.flatpak com.moonlight_stream.Moonlight master
+    --state-dir=build/flatpak/state \
+    --repo=build/flatpak/repo build/flatpak/builddir com.moonlight_stream.Moonlight.json
+flatpak build-bundle build/flatpak/repo build/flatpak/Moonlight-VRR.flatpak com.moonlight_stream.Moonlight master
 ```
 
 ## Install (Steam Deck)

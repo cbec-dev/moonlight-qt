@@ -203,7 +203,7 @@
             "sources": [
                 {
                     "type": "file",
-                    "path": "VkLayer_FROG_gamescope_wsi.x86_64.json"
+                    "path": "packaging/flatpak/VkLayer_FROG_gamescope_wsi.x86_64.json"
                 }
             ]
         },
@@ -220,23 +220,12 @@
             },
             "sources": [
                 {
-                    "type": "git",
-                    "url": "https://github.com/nonary/moonlight-qt.git",
-                    "disable-shallow-clone": true,
-                    "commit": "36eed89194676b7d83e3808cfab88ab17d13517d"
-                },
-                {
-                    "type": "patch",
-                    "path": "patches/0001-Port-vrr8-pacing-to-Linux.patch"
-                },
-                {
-                    "type": "patch",
-                    "path": "patches/0002-Retire-low-latency-vrr-checkbox.patch"
-                },
-                {
-                    "type": "shell",
-                    "commands": [
-                        "echo 6.1.0-vrr8 > app/version.txt"
+                    "type": "dir",
+                    "path": ".",
+                    "skip": [
+                        ".git",
+                        ".flatpak-builder",
+                        "build"
                     ]
                 }
             ]
