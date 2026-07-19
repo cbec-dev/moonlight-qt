@@ -24,12 +24,13 @@ ApplicationWindow {
 
     // This function runs prior to creation of the initial StackView item
     function doEarlyInit() {
-        // Override the background color to Material 2 colors for Qt 6.5+
-        // in order to improve contrast between GFE's placeholder box art
-        // and the background of the app grid.
-        if (SystemProperties.usesMaterial3Theme) {
-            Material.background = "#303030"
-        }
+        // Drive the Material palette from Theme so stock controls (buttons,
+        // dialogs, sliders) stay visually consistent with custom-themed
+        // components without each one repeating these values.
+        Material.theme = Material.Dark
+        Material.background = Theme.colorBackground
+        Material.accent = Theme.colorAccent
+        Material.foreground = Theme.colorTextPrimary
 
         SdlGamepadKeyNavigation.enable()
     }
@@ -110,6 +111,21 @@ ApplicationWindow {
         id: stackView
         anchors.fill: parent
         focus: true
+
+        pushEnter: Transition {
+            NumberAnimation { property: "opacity"; from: 0; to: 1; duration: Theme.animNormal; easing.type: Theme.easeStandard }
+            NumberAnimation { property: "scale"; from: 0.98; to: 1; duration: Theme.animNormal; easing.type: Theme.easeStandard }
+        }
+        pushExit: Transition {
+            NumberAnimation { property: "opacity"; from: 1; to: 0; duration: Theme.animFast; easing.type: Theme.easeStandard }
+        }
+        popEnter: Transition {
+            NumberAnimation { property: "opacity"; from: 0; to: 1; duration: Theme.animNormal; easing.type: Theme.easeStandard }
+        }
+        popExit: Transition {
+            NumberAnimation { property: "opacity"; from: 1; to: 0; duration: Theme.animFast; easing.type: Theme.easeStandard }
+            NumberAnimation { property: "scale"; from: 1; to: 0.98; duration: Theme.animFast; easing.type: Theme.easeStandard }
+        }
 
         Component.onCompleted: {
             // Perform our early initialization before constructing
@@ -239,12 +255,25 @@ ApplicationWindow {
         anchors.topMargin: 5
         anchors.bottomMargin: 5
 
+        background: Rectangle {
+            color: Theme.colorBackgroundElevated
+
+            Rectangle {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                height: 1
+                color: Theme.colorBorder
+            }
+        }
+
         Label {
             id: titleLabel
             visible: toolBar.width > 700
             anchors.fill: parent
             text: stackView.currentItem.objectName
             font.pointSize: 20
+            color: Theme.colorTextPrimary
             elide: Label.ElideRight
             horizontalAlignment: Qt.AlignHCenter
             verticalAlignment: Qt.AlignVCenter
@@ -274,6 +303,7 @@ ApplicationWindow {
             Label {
                 id: titleRowLabel
                 font.pointSize: titleLabel.font.pointSize
+                color: Theme.colorTextPrimary
                 elide: Label.ElideRight
                 horizontalAlignment: Qt.AlignHCenter
                 verticalAlignment: Qt.AlignVCenter
