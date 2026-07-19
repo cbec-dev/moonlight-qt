@@ -99,7 +99,7 @@ Flickable {
         width: settingsPage.width / 2
         spacing: 15
 
-        GroupBox {
+        ThemedGroupBox {
             id: basicSettingsGroupBox
             width: (parent.width - (parent.leftPadding + parent.rightPadding))
             padding: 12
@@ -975,7 +975,7 @@ Flickable {
                         }
                     }
 
-                    GroupBox {
+                    ThemedGroupBox {
                         id: vrrSettingsGroupBox
                         width: parent.width
                         padding: 12
@@ -1085,7 +1085,7 @@ Flickable {
             }
         }
 
-        GroupBox {
+        ThemedGroupBox {
 
             id: audioSettingsGroupBox
             width: (parent.width - (parent.leftPadding + parent.rightPadding))
@@ -1179,7 +1179,7 @@ Flickable {
             }
         }
 
-        GroupBox {
+        ThemedGroupBox {
             id: hostSettingsGroupBox
             width: (parent.width - (parent.leftPadding + parent.rightPadding))
             padding: 12
@@ -1219,7 +1219,7 @@ Flickable {
             }
         }
 
-        GroupBox {
+        ThemedGroupBox {
             id: uiSettingsGroupBox
             width: (parent.width - (parent.leftPadding + parent.rightPadding))
             padding: 12
@@ -1528,7 +1528,7 @@ Flickable {
         width: settingsPage.width / 2
         spacing: 15
 
-        GroupBox {
+        ThemedGroupBox {
             id: inputSettingsGroupBox
             width: (parent.width - (parent.leftPadding + parent.rightPadding))
             padding: 12
@@ -1676,7 +1676,7 @@ Flickable {
             }
         }
 
-        GroupBox {
+        ThemedGroupBox {
             id: gamepadSettingsGroupBox
             width: (parent.width - (parent.leftPadding + parent.rightPadding))
             padding: 12
@@ -1751,7 +1751,7 @@ Flickable {
             }
         }
 
-        GroupBox {
+        ThemedGroupBox {
             id: advancedSettingsGroupBox
             width: (parent.width - (parent.leftPadding + parent.rightPadding))
             padding: 12
