@@ -549,6 +549,20 @@ int main(int argc, char *argv[])
     SSL_free(nullptr);
 #endif
 
+    // Apply the user's UI scale preference before the QGuiApplication is
+    // created, since Qt only reads QT_SCALE_FACTOR at startup. We read the
+    // raw QSettings key here because StreamingPreferences can't be
+    // constructed this early.
+    if (qEnvironmentVariableIsEmpty("QT_SCALE_FACTOR")) {
+        QSettings settings;
+        // Key and values must match SER_UISCALE / StreamingPreferences::UIScale
+        int uiScale = settings.value("uiscale", 0).toInt(); // 0 == SCALE_AUTO
+        static const char* uiScaleFactors[] = { nullptr, "0.75", "1", "1.25", "1.5", "2" };
+        if (uiScale > 0 && uiScale < (int)SDL_arraysize(uiScaleFactors)) {
+            qputenv("QT_SCALE_FACTOR", uiScaleFactors[uiScale]);
+        }
+    }
+
     // We keep this at function scope to ensure it stays around while we're running,
     // because the Qt QPA will need to read it. Since the temporary file is only
     // created when open() is called, this doesn't do any harm for other platforms.

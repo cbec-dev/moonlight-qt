@@ -1518,6 +1518,68 @@ Flickable {
 
                 Label {
                     width: parent.width
+                    id: uiScaleTitle
+                    text: qsTr("UI size")
+                    font.pointSize: 12
+                    wrapMode: Text.Wrap
+                }
+
+                AutoResizingComboBox {
+                    // ignore setting the index at first, and actually set it when the component is loaded
+                    Component.onCompleted: {
+                        var saved_uiscale = StreamingPreferences.uiScale
+                        currentIndex = 0
+                        for (var i = 0; i < uiScaleListModel.count; i++) {
+                            if (saved_uiscale === uiScaleListModel.get(i).val) {
+                                currentIndex = i
+                                break
+                            }
+                        }
+
+                        activated(currentIndex)
+                    }
+
+                    id: uiScaleComboBox
+                    textRole: "text"
+                    model: ListModel {
+                        id: uiScaleListModel
+                        ListElement {
+                            text: qsTr("Auto (system)")
+                            val: StreamingPreferences.SCALE_AUTO
+                        }
+                        ListElement {
+                            text: "75%"
+                            val: StreamingPreferences.SCALE_75
+                        }
+                        ListElement {
+                            text: "100%"
+                            val: StreamingPreferences.SCALE_100
+                        }
+                        ListElement {
+                            text: "125%"
+                            val: StreamingPreferences.SCALE_125
+                        }
+                        ListElement {
+                            text: "150%"
+                            val: StreamingPreferences.SCALE_150
+                        }
+                        ListElement {
+                            text: "200%"
+                            val: StreamingPreferences.SCALE_200
+                        }
+                    }
+                    // ::onActivated must be used, as it only listens for when the index is changed by a human
+                    onActivated : {
+                        var new_uiscale = uiScaleListModel.get(currentIndex).val
+                        if (StreamingPreferences.uiScale !== new_uiscale) {
+                            StreamingPreferences.uiScale = new_uiscale
+                            ToolTip.show(qsTr("You must restart Moonlight for this change to take effect"), 5000)
+                        }
+                    }
+                }
+
+                Label {
+                    width: parent.width
                     id: gridDensityTitle
                     text: qsTr("Box art size")
                     font.pointSize: 12
