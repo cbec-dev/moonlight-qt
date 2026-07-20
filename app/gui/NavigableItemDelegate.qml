@@ -21,19 +21,37 @@ ItemDelegate {
         anchors.fill: parent
         radius: Theme.radiusCard
         color: control.highlighted || control.hovered ? Theme.colorSurfaceHover : Theme.colorSurface
-        border.width: control.highlighted ? Theme.focusRingWidth : 1
-        border.color: control.highlighted ? Theme.colorFocusRing : Theme.colorBorder
 
         Behavior on color { ColorAnimation { duration: Theme.animFast } }
-        Behavior on border.color { ColorAnimation { duration: Theme.animFast } }
-        Behavior on border.width { NumberAnimation { duration: Theme.animFast } }
+    }
+
+    // Focus ring + halo drawn as an overlay above all delegate content
+    // (not part of `background`, which Qt Quick Controls always renders
+    // behind the delegate's other children via an implicit z:-1). Cards
+    // with full-bleed content, like AppView's box art, would otherwise
+    // paint over a border/glow living in `background`.
+    Item {
+        id: focusRingOverlay
+        anchors.fill: parent
+        z: 100
+
+        Rectangle {
+            anchors.fill: parent
+            radius: Theme.radiusCard
+            color: "transparent"
+            border.width: control.highlighted ? Theme.focusRingWidth : 1
+            border.color: control.highlighted ? Theme.colorFocusRing : Theme.colorBorder
+
+            Behavior on border.color { ColorAnimation { duration: Theme.animFast } }
+            Behavior on border.width { NumberAnimation { duration: Theme.animFast } }
+        }
 
         // Soft halo around the focus ring, approximating the mockups' glow
         // without pulling in the Qt5Compat.GraphicalEffects module.
         Rectangle {
             anchors.fill: parent
             anchors.margins: -6
-            radius: parent.radius + 6
+            radius: Theme.radiusCard + 6
             color: "transparent"
             border.width: 6
             border.color: Theme.colorFocusRing
