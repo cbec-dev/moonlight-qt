@@ -1462,6 +1462,60 @@ Flickable {
                     }
                 }
 
+                Label {
+                    width: parent.width
+                    id: uiThemeTitle
+                    text: qsTr("Theme")
+                    font.pointSize: 12
+                    wrapMode: Text.Wrap
+                }
+
+                AutoResizingComboBox {
+                    // ignore setting the index at first, and actually set it when the component is loaded
+                    Component.onCompleted: {
+                        var saved_theme = StreamingPreferences.uiThemeName
+                        currentIndex = 0
+                        for (var i = 0; i < uiThemeListModel.count; i++) {
+                            if (saved_theme === uiThemeListModel.get(i).val) {
+                                currentIndex = i
+                                break
+                            }
+                        }
+
+                        activated(currentIndex)
+                    }
+
+                    id: uiThemeComboBox
+                    textRole: "text"
+                    model: ListModel {
+                        id: uiThemeListModel
+                        ListElement {
+                            text: qsTr("Midnight")
+                            val: "midnight"
+                        }
+                        ListElement {
+                            text: qsTr("Legion Purple")
+                            val: "legionPurple"
+                        }
+                        ListElement {
+                            text: qsTr("Amber OLED")
+                            val: "amberOled"
+                        }
+                        ListElement {
+                            text: qsTr("Steam Blue")
+                            val: "steamBlue"
+                        }
+                        ListElement {
+                            text: qsTr("High Contrast")
+                            val: "highContrast"
+                        }
+                    }
+                    // ::onActivated must be used, as it only listens for when the index is changed by a human
+                    onActivated : {
+                        StreamingPreferences.uiThemeName = uiThemeListModel.get(currentIndex).val
+                    }
+                }
+
                 CheckBox {
                     id: connectionWarningsCheck
                     width: parent.width
