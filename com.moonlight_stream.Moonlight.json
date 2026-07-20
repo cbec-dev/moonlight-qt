@@ -223,9 +223,9 @@
                     "type": "dir",
                     "path": ".",
                     "skip": [
-                        ".git",
                         ".flatpak-builder",
-                        "build"
+                        "build",
+                        "build-dir"
                     ]
                 }
             ]

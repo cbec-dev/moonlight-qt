@@ -590,4 +590,16 @@ macx {
 }
 
 VERSION = "$$cat(version.txt)"
-DEFINES += VERSION_STR=\\\"$$cat(version.txt)\\\"
+
+# Append the short git commit hash to the displayed version string (not to
+# VERSION itself, which some platforms require to stay numeric-ish) so a
+# running build can always be matched back to an exact commit — useful for
+# confirming a Flatpak/local build actually picked up the latest changes
+# instead of an unrelated stale cache. Falls back silently (no suffix) if
+# .git isn't present, e.g. if a packaging source snapshot excludes it.
+GIT_HASH = $$system(cd $$_PRO_FILE_PWD_ && git rev-parse --short=8 HEAD 2>/dev/null)
+isEmpty(GIT_HASH) {
+    DEFINES += VERSION_STR=\\\"$$cat(version.txt)\\\"
+} else {
+    DEFINES += VERSION_STR=\\\"$$cat(version.txt)+$$GIT_HASH\\\"
+}
