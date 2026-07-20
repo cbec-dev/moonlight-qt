@@ -6,6 +6,7 @@ import Qt5Compat.GraphicalEffects
 import AppModel 1.0
 import ComputerManager 1.0
 import SdlGamepadKeyNavigation 1.0
+import StreamingPreferences 1.0
 
 CenteredGridView {
     property int computerIndex
@@ -21,7 +22,10 @@ CenteredGridView {
     bottomMargin: 5
     // 2:3 ratio matches typical GFE/Steam vertical box art (e.g. 600x900),
     // so PreserveAspectCrop rarely has to crop much off "normal" cover art.
-    baseCellWidth: 230; baseCellHeight: 345;
+    property real densityScale: StreamingPreferences.gridDensity === StreamingPreferences.DENSITY_COMPACT ? 0.8
+                              : StreamingPreferences.gridDensity === StreamingPreferences.DENSITY_LARGE ? 1.25
+                              : 1.0
+    baseCellWidth: 230 * densityScale; baseCellHeight: 345 * densityScale;
 
     function computerLost()
     {
@@ -162,7 +166,7 @@ CenteredGridView {
                     anchors.margins: Theme.spacingS
                     text: model.name
                     color: Theme.colorTextPrimary
-                    font.pointSize: 13
+                    font.pointSize: Math.round(13 * appGrid.densityScale)
                     font.bold: true
                     elide: Text.ElideRight
                     wrapMode: Text.NoWrap

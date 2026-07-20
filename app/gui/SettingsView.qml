@@ -1516,6 +1516,52 @@ Flickable {
                     }
                 }
 
+                Label {
+                    width: parent.width
+                    id: gridDensityTitle
+                    text: qsTr("Box art size")
+                    font.pointSize: 12
+                    wrapMode: Text.Wrap
+                }
+
+                AutoResizingComboBox {
+                    // ignore setting the index at first, and actually set it when the component is loaded
+                    Component.onCompleted: {
+                        var saved_density = StreamingPreferences.gridDensity
+                        currentIndex = 0
+                        for (var i = 0; i < gridDensityListModel.count; i++) {
+                            if (saved_density === gridDensityListModel.get(i).val) {
+                                currentIndex = i
+                                break
+                            }
+                        }
+
+                        activated(currentIndex)
+                    }
+
+                    id: gridDensityComboBox
+                    textRole: "text"
+                    model: ListModel {
+                        id: gridDensityListModel
+                        ListElement {
+                            text: qsTr("Compact")
+                            val: StreamingPreferences.DENSITY_COMPACT
+                        }
+                        ListElement {
+                            text: qsTr("Normal")
+                            val: StreamingPreferences.DENSITY_NORMAL
+                        }
+                        ListElement {
+                            text: qsTr("Large")
+                            val: StreamingPreferences.DENSITY_LARGE
+                        }
+                    }
+                    // ::onActivated must be used, as it only listens for when the index is changed by a human
+                    onActivated : {
+                        StreamingPreferences.gridDensity = gridDensityListModel.get(currentIndex).val
+                    }
+                }
+
                 CheckBox {
                     id: connectionWarningsCheck
                     width: parent.width
