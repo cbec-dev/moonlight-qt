@@ -119,6 +119,32 @@ public:
     };
     Q_ENUM(CaptureSysKeysMode);
 
+    enum UIScale
+    {
+        SCALE_AUTO,
+        SCALE_75,
+        SCALE_100,
+        SCALE_125,
+        SCALE_150,
+        SCALE_200,
+    };
+    Q_ENUM(UIScale)
+
+    enum GridDensity
+    {
+        DENSITY_COMPACT,
+        DENSITY_NORMAL,
+        DENSITY_LARGE,
+    };
+    Q_ENUM(GridDensity)
+
+    enum AppSortMode
+    {
+        SORT_ALPHABETICAL,
+        SORT_RECENTLY_PLAYED,
+    };
+    Q_ENUM(AppSortMode)
+
     Q_PROPERTY(int width MEMBER width NOTIFY displayModeChanged)
     Q_PROPERTY(int height MEMBER height NOTIFY displayModeChanged)
     Q_PROPERTY(int fps MEMBER fps NOTIFY displayModeChanged)
@@ -160,6 +186,11 @@ public:
     Q_PROPERTY(bool keepAwake MEMBER keepAwake NOTIFY keepAwakeChanged)
     Q_PROPERTY(CaptureSysKeysMode captureSysKeysMode MEMBER captureSysKeysMode NOTIFY captureSysKeysModeChanged)
     Q_PROPERTY(Language language MEMBER language NOTIFY languageChanged);
+    Q_PROPERTY(UIScale uiScale MEMBER uiScale NOTIFY uiScaleChanged)
+    Q_PROPERTY(QString uiThemeName MEMBER uiThemeName NOTIFY uiThemeNameChanged)
+    Q_PROPERTY(GridDensity gridDensity MEMBER gridDensity NOTIFY gridDensityChanged)
+    Q_PROPERTY(AppSortMode appSortMode MEMBER appSortMode NOTIFY appSortModeChanged)
+    Q_PROPERTY(bool favoritesFirst MEMBER favoritesFirst NOTIFY favoritesFirstChanged)
 
     Q_INVOKABLE bool retranslate();
 
@@ -206,6 +237,11 @@ public:
     Language language;
     CaptureSysKeysMode captureSysKeysMode;
     RendererSelection rendererSelection;
+    UIScale uiScale;
+    QString uiThemeName;
+    GridDensity gridDensity;
+    AppSortMode appSortMode;
+    bool favoritesFirst;
 
 signals:
     void displayModeChanged();
@@ -247,6 +283,11 @@ signals:
     void keepAwakeChanged();
     void languageChanged();
     void rendererSelectionChanged();
+    void uiScaleChanged();
+    void uiThemeNameChanged();
+    void gridDensityChanged();
+    void appSortModeChanged();
+    void favoritesFirstChanged();
 
 private:
     explicit StreamingPreferences(QQmlEngine *qmlEngine);

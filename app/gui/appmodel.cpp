@@ -1,4 +1,7 @@
 #include "appmodel.h"
+#include "settings/streamingpreferences.h"
+
+#include <QDateTime>
 
 AppModel::AppModel(QObject *parent)
     : QAbstractListModel(parent)
@@ -43,6 +46,25 @@ Session* AppModel::createSessionForApp(int appIndex)
 {
     Q_ASSERT(appIndex < m_VisibleApps.count());
     NvApp app = m_VisibleApps.at(appIndex);
+
+    // Remember when this app was last launched for recently-played sorting
+    {
+        QWriteLocker lock(&m_Computer->lock);
+
+        for (NvApp& computerApp : m_Computer->appList) {
+            if (computerApp.id == app.id) {
+                computerApp.lastPlayedEpochSecs = QDateTime::currentSecsSinceEpoch();
+                break;
+            }
+        }
+    }
+
+    // Persist the timestamp without notifying the UI. A notification here
+    // reorders the grid (model reset) while the launch is still in flight,
+    // which destroys the initiating delegate and breaks the stream segue.
+    // The grid picks up the new order on the next computer state change
+    // (e.g. when the game is reported as running), safely behind the stream.
+    m_ComputerManager->clientSideAttributeUpdated(m_Computer, false);
 
     return new Session(m_Computer, app);
 }
@@ -93,6 +115,10 @@ QVariant AppModel::data(const QModelIndex &index, int role) const
         return app.directLaunch;
     case AppCollectorGameRole:
         return app.isAppCollectorGame;
+    case FavoriteRole:
+        return app.favorite;
+    case LastPlayedRole:
+        return app.lastPlayedEpochSecs;
     default:
         return QVariant();
     }
@@ -109,6 +135,8 @@ QHash<int, QByteArray> AppModel::roleNames() const
     names[AppIdRole] = "appid";
     names[DirectLaunchRole] = "directLaunch";
     names[AppCollectorGameRole] = "appCollectorGame";
+    names[FavoriteRole] = "favorite";
+    names[LastPlayedRole] = "lastPlayed";
 
     return names;
 }
@@ -145,11 +173,45 @@ QVector<NvApp> AppModel::getVisibleApps(const QVector<NvApp>& appList)
     return visibleApps;
 }
 
+bool AppModel::appLessThan(const NvApp& a, const NvApp& b) const
+{
+    if (m_FavoritesFirst && a.favorite != b.favorite) {
+        return a.favorite;
+    }
+    if (m_SortMode == StreamingPreferences::SORT_RECENTLY_PLAYED &&
+            a.lastPlayedEpochSecs != b.lastPlayedEpochSecs) {
+        return a.lastPlayedEpochSecs > b.lastPlayedEpochSecs;
+    }
+    return a.name.toLower() < b.name.toLower();
+}
+
+void AppModel::setSortMode(int sortMode)
+{
+    if (m_SortMode != sortMode) {
+        m_SortMode = sortMode;
+        updateAppList(m_AllApps);
+        emit sortModeChanged();
+    }
+}
+
+void AppModel::setFavoritesFirst(bool favoritesFirst)
+{
+    if (m_FavoritesFirst != favoritesFirst) {
+        m_FavoritesFirst = favoritesFirst;
+        updateAppList(m_AllApps);
+        emit favoritesFirstChanged();
+    }
+}
+
 void AppModel::updateAppList(QVector<NvApp> newList)
 {
     m_AllApps = newList;
 
     QVector<NvApp> newVisibleList = getVisibleApps(newList);
+    std::stable_sort(newVisibleList.begin(), newVisibleList.end(),
+                     [this](const NvApp& a, const NvApp& b) {
+                         return appLessThan(a, b);
+                     });
 
     // Process removals and updates first
     for (int i = 0; i < m_VisibleApps.count(); i++) {
@@ -189,7 +251,7 @@ void AppModel::updateAppList(QVector<NvApp> newList)
                 found = true;
                 break;
             }
-            else if (existingApp.name.toLower() > newApp.name.toLower()) {
+            else if (appLessThan(newApp, existingApp)) {
                 insertionIndex = i;
                 break;
             }
@@ -202,7 +264,15 @@ void AppModel::updateAppList(QVector<NvApp> newList)
         }
     }
 
-    Q_ASSERT(newVisibleList == m_VisibleApps);
+    // The incremental diff above preserves the relative order of surviving
+    // rows, so anything that reorders existing entries (sort mode change,
+    // favorite toggled, last-played timestamp updated) can't be expressed
+    // as removals+insertions. Fall back to a reset in that case.
+    if (newVisibleList != m_VisibleApps) {
+        beginResetModel();
+        m_VisibleApps = newVisibleList;
+        endResetModel();
+    }
 }
 
 void AppModel::setAppHidden(int appIndex, bool hidden)
@@ -216,6 +286,25 @@ void AppModel::setAppHidden(int appIndex, bool hidden)
         for (NvApp& app : m_Computer->appList) {
             if (app.id == appId) {
                 app.hidden = hidden;
+                break;
+            }
+        }
+    }
+
+    m_ComputerManager->clientSideAttributeUpdated(m_Computer);
+}
+
+void AppModel::setAppFavorite(int appIndex, bool favorite)
+{
+    Q_ASSERT(appIndex < m_VisibleApps.count());
+    int appId = m_VisibleApps.at(appIndex).id;
+
+    {
+        QWriteLocker lock(&m_Computer->lock);
+
+        for (NvApp& app : m_Computer->appList) {
+            if (app.id == appId) {
+                app.favorite = favorite;
                 break;
             }
         }

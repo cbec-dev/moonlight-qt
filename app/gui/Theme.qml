@@ -1,6 +1,8 @@
 pragma Singleton
 import QtQuick 2.9
 
+import StreamingPreferences 1.0
+
 // Central design-token singleton. Components bind to Theme.* only, never to a
 // palette directly, so switching themeName is enough to re-skin the whole app.
 // Mirrors mockups/base.css (structural tokens) + mockups/themes.css (palettes).
@@ -34,8 +36,7 @@ QtObject {
     readonly property int focusRingWidth: 3
 
     // ---- Theme selection ----
-    // Backed by StreamingPreferences.uiThemeName once the preference is wired up (Phase 2+).
-    property string themeName: "midnight"
+    property string themeName: StreamingPreferences.uiThemeName
 
     readonly property QtObject palettes: QtObject {
         readonly property QtObject midnight: QtObject {
@@ -160,4 +161,7 @@ QtObject {
     // themed per-palette (mirrors mockups/themes.css, where every palette
     // used a near-black scrim regardless of accent color).
     readonly property color colorScrimBottom: "#EB0A0B0F"
+
+    // Translucent surface for controls overlaid on box art (resume/quit buttons).
+    readonly property color colorOverlay: Qt.rgba(colorSurface.r, colorSurface.g, colorSurface.b, 0.82)
 }

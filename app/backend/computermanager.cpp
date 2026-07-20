@@ -557,10 +557,16 @@ void ComputerManager::renameHost(NvComputer* computer, QString name)
     handleComputerStateChanged(computer);
 }
 
-void ComputerManager::clientSideAttributeUpdated(NvComputer* computer)
+void ComputerManager::clientSideAttributeUpdated(NvComputer* computer, bool notify)
 {
-    // Notify the UI of the state change
-    handleComputerStateChanged(computer);
+    if (notify) {
+        // Notify the UI of the state change
+        handleComputerStateChanged(computer);
+    }
+    else {
+        // Persist the change without a UI notification
+        saveHost(computer);
+    }
 }
 
 void ComputerManager::handleAboutToQuit()

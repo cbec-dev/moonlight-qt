@@ -22,16 +22,17 @@ ApplicationWindow {
     width: 1280
     height: 600
 
+    // Drive the Material palette from Theme so stock controls (buttons,
+    // dialogs, sliders) stay visually consistent with custom-themed
+    // components without each one repeating these values. Declarative
+    // bindings so a theme change re-skins the app live.
+    Material.theme: Material.Dark
+    Material.background: Theme.colorBackground
+    Material.accent: Theme.colorAccent
+    Material.foreground: Theme.colorTextPrimary
+
     // This function runs prior to creation of the initial StackView item
     function doEarlyInit() {
-        // Drive the Material palette from Theme so stock controls (buttons,
-        // dialogs, sliders) stay visually consistent with custom-themed
-        // components without each one repeating these values.
-        Material.theme = Material.Dark
-        Material.background = Theme.colorBackground
-        Material.accent = Theme.colorAccent
-        Material.foreground = Theme.colorTextPrimary
-
         SdlGamepadKeyNavigation.enable()
     }
 
@@ -367,6 +368,60 @@ ApplicationWindow {
 
                 Keys.onDownPressed: {
                     stackView.currentItem.forceActiveFocus(Qt.TabFocus)
+                }
+            }
+
+            NavigableToolButton {
+                id: sortButton
+                visible: stackView.currentItem instanceof AppView
+
+                iconSource: "qrc:/res/sort.svg"
+
+                ToolTip.delay: 1000
+                ToolTip.timeout: 3000
+                ToolTip.visible: hovered
+                ToolTip.text: qsTr("Sort apps")
+
+                onClicked: {
+                    sortMenu.open()
+                }
+
+                Keys.onDownPressed: {
+                    stackView.currentItem.forceActiveFocus(Qt.TabFocus)
+                }
+
+                NavigableMenu {
+                    id: sortMenu
+                    initiator: sortButton
+                    y: sortButton.height
+
+                    NavigableMenuItem {
+                        checkable: true
+                        checked: StreamingPreferences.appSortMode === StreamingPreferences.SORT_ALPHABETICAL
+                        text: qsTr("Sort A-Z")
+                        onTriggered: {
+                            StreamingPreferences.appSortMode = StreamingPreferences.SORT_ALPHABETICAL
+                            StreamingPreferences.save()
+                        }
+                    }
+                    NavigableMenuItem {
+                        checkable: true
+                        checked: StreamingPreferences.appSortMode === StreamingPreferences.SORT_RECENTLY_PLAYED
+                        text: qsTr("Sort by recently played")
+                        onTriggered: {
+                            StreamingPreferences.appSortMode = StreamingPreferences.SORT_RECENTLY_PLAYED
+                            StreamingPreferences.save()
+                        }
+                    }
+                    NavigableMenuItem {
+                        checkable: true
+                        checked: StreamingPreferences.favoritesFirst
+                        text: qsTr("Favorites first")
+                        onTriggered: {
+                            StreamingPreferences.favoritesFirst = !StreamingPreferences.favoritesFirst
+                            StreamingPreferences.save()
+                        }
+                    }
                 }
             }
 

@@ -55,6 +55,13 @@
 #define SER_KEEPAWAKE "keepawake"
 #define SER_LANGUAGE "language"
 #define SER_RENDERER "renderer"
+// SER_UISCALE is also read early in main.cpp (before StreamingPreferences
+// exists) to set QT_SCALE_FACTOR — keep the key strings in sync.
+#define SER_UISCALE "uiscale"
+#define SER_UITHEME "uitheme"
+#define SER_GRIDDENSITY "griddensity"
+#define SER_APPSORTMODE "appsortmode"
+#define SER_FAVORITESFIRST "favoritesfirst"
 
 #define CURRENT_DEFAULT_VER 2
 
@@ -177,6 +184,14 @@ void StreamingPreferences::reload()
                                                                                                                  : UIDisplayMode::UI_MAXIMIZED)).toInt());
     language = static_cast<Language>(settings.value(SER_LANGUAGE,
                                                     static_cast<int>(Language::LANG_AUTO)).toInt());
+    uiScale = static_cast<UIScale>(settings.value(SER_UISCALE,
+                                                  static_cast<int>(UIScale::SCALE_AUTO)).toInt());
+    uiThemeName = settings.value(SER_UITHEME, "midnight").toString();
+    gridDensity = static_cast<GridDensity>(settings.value(SER_GRIDDENSITY,
+                                                          static_cast<int>(GridDensity::DENSITY_NORMAL)).toInt());
+    appSortMode = static_cast<AppSortMode>(settings.value(SER_APPSORTMODE,
+                                                          static_cast<int>(AppSortMode::SORT_ALPHABETICAL)).toInt());
+    favoritesFirst = settings.value(SER_FAVORITESFIRST, true).toBool();
 
 
     // Perform default settings updates as required based on last default version
@@ -375,6 +390,11 @@ void StreamingPreferences::save()
     settings.setValue(SER_SWAPFACEBUTTONS, swapFaceButtons);
     settings.setValue(SER_CAPTURESYSKEYS, captureSysKeysMode);
     settings.setValue(SER_KEEPAWAKE, keepAwake);
+    settings.setValue(SER_UISCALE, static_cast<int>(uiScale));
+    settings.setValue(SER_UITHEME, uiThemeName);
+    settings.setValue(SER_GRIDDENSITY, static_cast<int>(gridDensity));
+    settings.setValue(SER_APPSORTMODE, static_cast<int>(appSortMode));
+    settings.setValue(SER_FAVORITESFIRST, favoritesFirst);
 }
 
 int StreamingPreferences::getDefaultBitrate(int width, int height, int fps, bool yuv444)

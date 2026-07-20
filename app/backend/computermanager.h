@@ -242,7 +242,9 @@ public:
 
     void renameHost(NvComputer* computer, QString name);
 
-    void clientSideAttributeUpdated(NvComputer* computer);
+    // Pass notify = false to persist the attribute change without emitting
+    // computerStateChanged (the UI picks it up on the next state change).
+    void clientSideAttributeUpdated(NvComputer* computer, bool notify = true);
 
 signals:
     void computerStateChanged(NvComputer* computer);

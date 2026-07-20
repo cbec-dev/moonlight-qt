@@ -103,7 +103,7 @@ Flickable {
             id: basicSettingsGroupBox
             width: (parent.width - (parent.leftPadding + parent.rightPadding))
             padding: 12
-            title: "<font color=\"skyblue\">" + qsTr("Basic Settings") + "</font>"
+            title: qsTr("Basic Settings")
             font.pointSize: 12
 
             Column {
@@ -979,7 +979,7 @@ Flickable {
                         id: vrrSettingsGroupBox
                         width: parent.width
                         padding: 12
-                        title: "<font color=\"skyblue\">" + qsTr("Variable Refresh Rate (VRR)") + "</font>"
+                        title: qsTr("Variable Refresh Rate (VRR)")
                         font.pointSize: 12
 
                         Column {
@@ -1090,7 +1090,7 @@ Flickable {
             id: audioSettingsGroupBox
             width: (parent.width - (parent.leftPadding + parent.rightPadding))
             padding: 12
-            title: "<font color=\"skyblue\">" + qsTr("Audio Settings") + "</font>"
+            title: qsTr("Audio Settings")
             font.pointSize: 12
 
             Column {
@@ -1183,7 +1183,7 @@ Flickable {
             id: hostSettingsGroupBox
             width: (parent.width - (parent.leftPadding + parent.rightPadding))
             padding: 12
-            title: "<font color=\"skyblue\">" + qsTr("Host Settings") + "</font>"
+            title: qsTr("Host Settings")
             font.pointSize: 12
 
             Column {
@@ -1223,7 +1223,7 @@ Flickable {
             id: uiSettingsGroupBox
             width: (parent.width - (parent.leftPadding + parent.rightPadding))
             padding: 12
-            title: "<font color=\"skyblue\">" + qsTr("UI Settings") + "</font>"
+            title: qsTr("UI Settings")
             font.pointSize: 12
 
             Column {
@@ -1462,6 +1462,168 @@ Flickable {
                     }
                 }
 
+                Label {
+                    width: parent.width
+                    id: uiThemeTitle
+                    text: qsTr("Theme")
+                    font.pointSize: 12
+                    wrapMode: Text.Wrap
+                }
+
+                AutoResizingComboBox {
+                    // ignore setting the index at first, and actually set it when the component is loaded
+                    Component.onCompleted: {
+                        var saved_theme = StreamingPreferences.uiThemeName
+                        currentIndex = 0
+                        for (var i = 0; i < uiThemeListModel.count; i++) {
+                            if (saved_theme === uiThemeListModel.get(i).val) {
+                                currentIndex = i
+                                break
+                            }
+                        }
+
+                        activated(currentIndex)
+                    }
+
+                    id: uiThemeComboBox
+                    textRole: "text"
+                    model: ListModel {
+                        id: uiThemeListModel
+                        ListElement {
+                            text: qsTr("Midnight")
+                            val: "midnight"
+                        }
+                        ListElement {
+                            text: qsTr("Legion Purple")
+                            val: "legionPurple"
+                        }
+                        ListElement {
+                            text: qsTr("Amber OLED")
+                            val: "amberOled"
+                        }
+                        ListElement {
+                            text: qsTr("Steam Blue")
+                            val: "steamBlue"
+                        }
+                        ListElement {
+                            text: qsTr("High Contrast")
+                            val: "highContrast"
+                        }
+                    }
+                    // ::onActivated must be used, as it only listens for when the index is changed by a human
+                    onActivated : {
+                        StreamingPreferences.uiThemeName = uiThemeListModel.get(currentIndex).val
+                    }
+                }
+
+                Label {
+                    width: parent.width
+                    id: uiScaleTitle
+                    text: qsTr("UI size")
+                    font.pointSize: 12
+                    wrapMode: Text.Wrap
+                }
+
+                AutoResizingComboBox {
+                    // ignore setting the index at first, and actually set it when the component is loaded
+                    Component.onCompleted: {
+                        var saved_uiscale = StreamingPreferences.uiScale
+                        currentIndex = 0
+                        for (var i = 0; i < uiScaleListModel.count; i++) {
+                            if (saved_uiscale === uiScaleListModel.get(i).val) {
+                                currentIndex = i
+                                break
+                            }
+                        }
+
+                        activated(currentIndex)
+                    }
+
+                    id: uiScaleComboBox
+                    textRole: "text"
+                    model: ListModel {
+                        id: uiScaleListModel
+                        ListElement {
+                            text: qsTr("Auto (system)")
+                            val: StreamingPreferences.SCALE_AUTO
+                        }
+                        ListElement {
+                            text: "75%"
+                            val: StreamingPreferences.SCALE_75
+                        }
+                        ListElement {
+                            text: "100%"
+                            val: StreamingPreferences.SCALE_100
+                        }
+                        ListElement {
+                            text: "125%"
+                            val: StreamingPreferences.SCALE_125
+                        }
+                        ListElement {
+                            text: "150%"
+                            val: StreamingPreferences.SCALE_150
+                        }
+                        ListElement {
+                            text: "200%"
+                            val: StreamingPreferences.SCALE_200
+                        }
+                    }
+                    // ::onActivated must be used, as it only listens for when the index is changed by a human
+                    onActivated : {
+                        var new_uiscale = uiScaleListModel.get(currentIndex).val
+                        if (StreamingPreferences.uiScale !== new_uiscale) {
+                            StreamingPreferences.uiScale = new_uiscale
+                            ToolTip.show(qsTr("You must restart Moonlight for this change to take effect"), 5000)
+                        }
+                    }
+                }
+
+                Label {
+                    width: parent.width
+                    id: gridDensityTitle
+                    text: qsTr("Box art size")
+                    font.pointSize: 12
+                    wrapMode: Text.Wrap
+                }
+
+                AutoResizingComboBox {
+                    // ignore setting the index at first, and actually set it when the component is loaded
+                    Component.onCompleted: {
+                        var saved_density = StreamingPreferences.gridDensity
+                        currentIndex = 0
+                        for (var i = 0; i < gridDensityListModel.count; i++) {
+                            if (saved_density === gridDensityListModel.get(i).val) {
+                                currentIndex = i
+                                break
+                            }
+                        }
+
+                        activated(currentIndex)
+                    }
+
+                    id: gridDensityComboBox
+                    textRole: "text"
+                    model: ListModel {
+                        id: gridDensityListModel
+                        ListElement {
+                            text: qsTr("Compact")
+                            val: StreamingPreferences.DENSITY_COMPACT
+                        }
+                        ListElement {
+                            text: qsTr("Normal")
+                            val: StreamingPreferences.DENSITY_NORMAL
+                        }
+                        ListElement {
+                            text: qsTr("Large")
+                            val: StreamingPreferences.DENSITY_LARGE
+                        }
+                    }
+                    // ::onActivated must be used, as it only listens for when the index is changed by a human
+                    onActivated : {
+                        StreamingPreferences.gridDensity = gridDensityListModel.get(currentIndex).val
+                    }
+                }
+
                 CheckBox {
                     id: connectionWarningsCheck
                     width: parent.width
@@ -1532,7 +1694,7 @@ Flickable {
             id: inputSettingsGroupBox
             width: (parent.width - (parent.leftPadding + parent.rightPadding))
             padding: 12
-            title: "<font color=\"skyblue\">" + qsTr("Input Settings") + "</font>"
+            title: qsTr("Input Settings")
             font.pointSize: 12
 
             Column {
@@ -1680,7 +1842,7 @@ Flickable {
             id: gamepadSettingsGroupBox
             width: (parent.width - (parent.leftPadding + parent.rightPadding))
             padding: 12
-            title: "<font color=\"skyblue\">" + qsTr("Gamepad Settings") + "</font>"
+            title: qsTr("Gamepad Settings")
             font.pointSize: 12
 
             Column {
@@ -1755,7 +1917,7 @@ Flickable {
             id: advancedSettingsGroupBox
             width: (parent.width - (parent.leftPadding + parent.rightPadding))
             padding: 12
-            title: "<font color=\"skyblue\">" + qsTr("Advanced Settings") + "</font>"
+            title: qsTr("Advanced Settings")
             font.pointSize: 12
 
             Column {

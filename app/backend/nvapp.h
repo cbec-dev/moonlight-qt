@@ -15,7 +15,9 @@ public:
                 hdrSupported == other.hdrSupported &&
                 isAppCollectorGame == other.isAppCollectorGame &&
                 hidden == other.hidden &&
-                directLaunch == other.directLaunch;
+                directLaunch == other.directLaunch &&
+                favorite == other.favorite &&
+                lastPlayedEpochSecs == other.lastPlayedEpochSecs;
     }
 
     bool operator!=(const NvApp& other) const
@@ -39,6 +41,8 @@ public:
     bool isAppCollectorGame = false;
     bool hidden = false;
     bool directLaunch = false;
+    bool favorite = false;
+    qint64 lastPlayedEpochSecs = 0;
 };
 
 Q_DECLARE_METATYPE(NvApp)
