@@ -214,7 +214,7 @@ CenteredGridView {
                     ToolTip.timeout: 3000
                     ToolTip.visible: hovered
 
-                    Material.background: "#D0808080"
+                    Material.background: Theme.colorOverlay
                 }
 
                 RoundButton {
@@ -240,7 +240,7 @@ CenteredGridView {
                     ToolTip.timeout: 3000
                     ToolTip.visible: hovered
 
-                    Material.background: "#D0808080"
+                    Material.background: Theme.colorOverlay
                 }
             }
         }

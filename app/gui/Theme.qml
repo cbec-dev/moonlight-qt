@@ -161,4 +161,7 @@ QtObject {
     // themed per-palette (mirrors mockups/themes.css, where every palette
     // used a near-black scrim regardless of accent color).
     readonly property color colorScrimBottom: "#EB0A0B0F"
+
+    // Translucent surface for controls overlaid on box art (resume/quit buttons).
+    readonly property color colorOverlay: Qt.rgba(colorSurface.r, colorSurface.g, colorSurface.b, 0.82)
 }
