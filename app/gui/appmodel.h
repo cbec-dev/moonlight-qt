@@ -19,7 +19,13 @@ class AppModel : public QAbstractListModel
         AppIdRole,
         DirectLaunchRole,
         AppCollectorGameRole,
+        FavoriteRole,
+        LastPlayedRole,
     };
+
+    // Values match StreamingPreferences::AppSortMode
+    Q_PROPERTY(int sortMode READ sortMode WRITE setSortMode NOTIFY sortModeChanged)
+    Q_PROPERTY(bool favoritesFirst READ favoritesFirst WRITE setFavoritesFirst NOTIFY favoritesFirstChanged)
 
 public:
     explicit AppModel(QObject *parent = nullptr);
@@ -41,6 +47,14 @@ public:
 
     Q_INVOKABLE void setAppDirectLaunch(int appIndex, bool directLaunch);
 
+    Q_INVOKABLE void setAppFavorite(int appIndex, bool favorite);
+
+    int sortMode() const { return m_SortMode; }
+    void setSortMode(int sortMode);
+
+    bool favoritesFirst() const { return m_FavoritesFirst; }
+    void setFavoritesFirst(bool favoritesFirst);
+
     QVariant data(const QModelIndex &index, int role) const override;
 
     int rowCount(const QModelIndex &parent) const override;
@@ -55,8 +69,14 @@ private slots:
 signals:
     void computerLost();
 
+    void sortModeChanged();
+
+    void favoritesFirstChanged();
+
 private:
     void updateAppList(QVector<NvApp> newList);
+
+    bool appLessThan(const NvApp& a, const NvApp& b) const;
 
     QVector<NvApp> getVisibleApps(const QVector<NvApp>& appList);
 
@@ -68,4 +88,6 @@ private:
     QVector<NvApp> m_VisibleApps, m_AllApps;
     int m_CurrentGameId;
     bool m_ShowHiddenGames;
+    int m_SortMode = 0; // StreamingPreferences::SORT_ALPHABETICAL
+    bool m_FavoritesFirst = true;
 };

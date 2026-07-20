@@ -71,8 +71,22 @@ CenteredGridView {
     function createModel()
     {
         var model = Qt.createQmlObject('import AppModel 1.0; AppModel {}', parent, '')
+        model.sortMode = StreamingPreferences.appSortMode
+        model.favoritesFirst = StreamingPreferences.favoritesFirst
         model.initialize(ComputerManager, computerIndex, showHiddenGames)
         return model
+    }
+
+    // Keep the model's display order in sync with the sort preferences,
+    // which the toolbar sort menu changes while this view is alive.
+    Connections {
+        target: StreamingPreferences
+        function onAppSortModeChanged() {
+            appModel.sortMode = StreamingPreferences.appSortMode
+        }
+        function onFavoritesFirstChanged() {
+            appModel.favoritesFirst = StreamingPreferences.favoritesFirst
+        }
     }
 
     model: appModel
@@ -187,6 +201,19 @@ CenteredGridView {
             anchors.fill: appIcon
             source: appIcon
             maskSource: appIconMask
+        }
+
+        // Favorite star badge in the top-right corner of the box art
+        Label {
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.margins: Theme.spacingS
+            visible: model.favorite
+            text: "★"
+            color: Theme.colorAccent
+            font.pointSize: Math.round(16 * appGrid.densityScale)
+            style: Text.Outline
+            styleColor: Theme.colorScrimBottom
         }
 
         Loader {
@@ -385,6 +412,17 @@ CenteredGridView {
                     enabled: !model.hidden
 
                     ToolTip.text: qsTr("Launch this app immediately when the host is selected, bypassing the app selection grid.")
+                    ToolTip.delay: 1000
+                    ToolTip.timeout: 3000
+                    ToolTip.visible: hovered
+                }
+                NavigableMenuItem {
+                    checkable: true
+                    checked: model.favorite
+                    text: qsTr("Favorite")
+                    onTriggered: appModel.setAppFavorite(model.index, !model.favorite)
+
+                    ToolTip.text: qsTr("Favorite games are shown at the top of the app grid.")
                     ToolTip.delay: 1000
                     ToolTip.timeout: 3000
                     ToolTip.visible: hovered

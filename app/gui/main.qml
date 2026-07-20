@@ -372,6 +372,60 @@ ApplicationWindow {
             }
 
             NavigableToolButton {
+                id: sortButton
+                visible: stackView.currentItem instanceof AppView
+
+                iconSource: "qrc:/res/sort.svg"
+
+                ToolTip.delay: 1000
+                ToolTip.timeout: 3000
+                ToolTip.visible: hovered
+                ToolTip.text: qsTr("Sort apps")
+
+                onClicked: {
+                    sortMenu.open()
+                }
+
+                Keys.onDownPressed: {
+                    stackView.currentItem.forceActiveFocus(Qt.TabFocus)
+                }
+
+                NavigableMenu {
+                    id: sortMenu
+                    initiator: sortButton
+                    y: sortButton.height
+
+                    NavigableMenuItem {
+                        checkable: true
+                        checked: StreamingPreferences.appSortMode === StreamingPreferences.SORT_ALPHABETICAL
+                        text: qsTr("Sort A-Z")
+                        onTriggered: {
+                            StreamingPreferences.appSortMode = StreamingPreferences.SORT_ALPHABETICAL
+                            StreamingPreferences.save()
+                        }
+                    }
+                    NavigableMenuItem {
+                        checkable: true
+                        checked: StreamingPreferences.appSortMode === StreamingPreferences.SORT_RECENTLY_PLAYED
+                        text: qsTr("Sort by recently played")
+                        onTriggered: {
+                            StreamingPreferences.appSortMode = StreamingPreferences.SORT_RECENTLY_PLAYED
+                            StreamingPreferences.save()
+                        }
+                    }
+                    NavigableMenuItem {
+                        checkable: true
+                        checked: StreamingPreferences.favoritesFirst
+                        text: qsTr("Favorites first")
+                        onTriggered: {
+                            StreamingPreferences.favoritesFirst = !StreamingPreferences.favoritesFirst
+                            StreamingPreferences.save()
+                        }
+                    }
+                }
+            }
+
+            NavigableToolButton {
                 property string browserUrl: ""
 
                 id: updateButton
