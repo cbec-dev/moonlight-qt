@@ -849,11 +849,18 @@ bool PlVkRenderer::mapAvFrameToPlacebo(const AVFrame *frame, pl_frame* mappedFra
         mappedFrame->color.hdr.min_luma = PL_COLOR_HDR_BLACK;
     }
 
-    // HACK: AMF AV1 encoding on the host PC does not set full color range properly in the
-    // bitstream data, so libplacebo incorrectly renders the content as limited range.
+    // HACK: AMF AV1 encoding on the host PC does not always set color range in the
+    // bitstream data, so libplacebo falls back to assuming limited range for the
+    // content, when it's actually full range.
     //
-    // As a workaround, set full range manually in the mapped frame ourselves.
-    mappedFrame->repr.levels = PL_COLOR_LEVELS_FULL;
+    // As a workaround, set full range manually in the mapped frame ourselves, but
+    // only when the frame itself doesn't carry explicit range metadata. Streams
+    // that do signal their range (including genuinely limited range ones) must be
+    // left alone, or they render faded due to being denied their normal levels
+    // stretch from limited to full range.
+    if (frame->color_range == AVCOL_RANGE_UNSPECIFIED) {
+        mappedFrame->repr.levels = PL_COLOR_LEVELS_FULL;
+    }
 
     return true;
 }
